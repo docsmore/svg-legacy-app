@@ -1,0 +1,74 @@
+// Policy Administration System Types
+
+export interface Policy {
+  policyNumber: string;
+  status: PolicyStatus;
+  effectiveDate: string;
+  expirationDate: string;
+  premium: number;
+  productType: ProductType;
+  policyHolder: PolicyHolder;
+}
+
+export enum PolicyStatus {
+  ACTIVE = 'ACTIVE',
+  PENDING = 'PENDING',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
+  RENEWED = 'RENEWED'
+}
+
+export enum ProductType {
+  AUTO = 'AUTO',
+  HOME = 'HOME',
+  LIFE = 'LIFE',
+  HEALTH = 'HEALTH',
+  BUSINESS = 'BUSINESS'
+}
+
+export interface PolicyHolder {
+  id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  ssn: string;
+  email: string;
+  phone: string;
+  address: Address;
+}
+
+export interface Address {
+  street1: string;
+  street2?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+}
+
+export interface ScreenField {
+  row: number;
+  col: number;
+  length: number;
+  value: string;
+  isEditable?: boolean;
+  isHighlighted?: boolean;
+  fieldName?: string;
+}
+
+export interface ScreenConfig {
+  title: string;
+  fields: ScreenField[];
+  functionKeys: FunctionKey[];
+}
+
+export interface FunctionKey {
+  key: string;
+  description: string;
+  action: () => void;
+}
+
+export interface NavigationState {
+  currentScreen: string;
+  previousScreen?: string;
+  screenStack: string[];
+}

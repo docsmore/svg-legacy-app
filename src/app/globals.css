@@ -1,26 +1,135 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #00FF00;
+  --terminal-green: #00FF00;
+  --terminal-highlight: #00AA00;
+  --terminal-border: #004400;
+  --terminal-cursor: #FFFFFF;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@layer base {
+  :root {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #00FF00;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* AS/400 Terminal Styling */
+.terminal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--background);
+  color: var(--terminal-green);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  line-height: 1.2;
+  outline: none;
+  border: 2px solid var(--terminal-border);
+  box-sizing: border-box;
+}
+
+.terminal-header {
+  height: 30px;
+  background-color: var(--terminal-green);
+  color: var(--background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-bottom: 1px solid var(--terminal-border);
+}
+
+.terminal-screen {
+  flex: 1;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.terminal-row {
+  height: 20px;
+  white-space: pre;
+  display: flex;
+}
+
+.terminal-cell {
+  width: 10px;
+  height: 20px;
+  display: inline-block;
+}
+
+.terminal-cell.highlighted {
+  background-color: var(--terminal-highlight);
+  color: var(--background);
+}
+
+.terminal-cell.editable {
+  text-decoration: underline;
+}
+
+.terminal-cell.cursor {
+  background-color: var(--terminal-cursor);
+  color: var(--background);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.terminal-footer {
+  height: 40px;
+  border-top: 1px solid var(--terminal-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+
+.function-keys {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.function-key {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.key-label {
+  background-color: var(--terminal-green);
+  color: var(--background);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.key-desc {
+  font-size: 12px;
 }

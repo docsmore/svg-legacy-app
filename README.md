@@ -1,4 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SVG Legacy App - AS/400 Style Policy Administration System
+
+This is a modern web application that emulates the look and feel of a legacy AS/400 green screen terminal interface for a comprehensive policy administration system.
+
+## Features
+
+- **Authentic AS/400 Green Screen Interface**: Complete with function keys, field navigation, and classic green-on-black styling
+- **Policy Search**: Search for policies by policy number or policyholder information
+- **Policy Details**: View comprehensive policy information
+- **Policyholder Management**: Update policyholder personal and address information
+- **Product Management**: View and manage different insurance product types
+
+## Technology Stack
+
+- **Next.js**: Modern React framework with server-side rendering
+- **TypeScript**: For type safety and better developer experience
+- **Tailwind CSS**: For styling the application
 
 ## Getting Started
 
@@ -14,23 +30,30 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The application emulates an AS/400 terminal interface. Here's how to navigate:
 
-## Learn More
+- Use the **Tab** key to move between fields
+- Use **Enter** to submit forms or select options
+- Use **Function keys** (F1, F3, etc.) for various actions as indicated at the bottom of each screen
+- Use **Arrow keys** to navigate within the terminal
 
-To learn more about Next.js, take a look at the following resources:
+## Screens
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Main Menu**: Entry point to access all system functions
+2. **Policy Search**: Search for policies by various criteria
+3. **Policy Details**: View comprehensive information about a policy
+4. **Policyholder Management**: Update policyholder information
+5. **Product Management**: View and manage product types
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development
 
-## Deploy on Vercel
+This application is built with TypeScript and follows best practices for type safety and code organization.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Types and interfaces are centralized in the `/src/types` directory
+- Screen components are in the `/src/screens` directory
+- Core terminal emulation is handled by the Terminal component in `/src/components/terminal`
+- Mock data services are in the `/src/services` directory
