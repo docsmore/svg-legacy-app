@@ -58,7 +58,7 @@ const MainMenuScreen: React.FC = () => {
   ];
   
   const screenConfig: ScreenConfig = {
-    title: 'POLICY ADMINISTRATION SYSTEM',
+    title: 'POLICY ADMINISTRATION SYSTEM - SOLVRAYS',
     fields: [
       // Header
       { row: 0, col: 0, length: 80, value: 'POLICY ADMINISTRATION SYSTEM', isHighlighted: true },
