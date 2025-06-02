@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Terminal from '@/components/terminal/Terminal';
-import { ScreenConfig, FunctionKey, Beneficiary } from '@/types';
+import { ScreenConfig, FunctionKey, Beneficiary, ScreenField } from '@/types';
 import { 
   getPolicyByNumber, 
   getBeneficiaries, 
@@ -233,7 +233,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
           value: selectedIndex.toString(),
           isEditable: true,
           fieldName: 'selectedIndex'
-        });
+        } as ScreenField);
       }
     } else if (mode === BeneficiaryMode.ADD || mode === BeneficiaryMode.EDIT) {
       // Add/Edit form
@@ -248,7 +248,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
         value: formData.firstName || '',
         isEditable: true,
         fieldName: 'firstName'
-      });
+      } as ScreenField);
       
       fields.push({ row: 9, col: 5, length: 15, value: 'Last Name:' });
       fields.push({
@@ -258,7 +258,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
         value: formData.lastName || '',
         isEditable: true,
         fieldName: 'lastName'
-      });
+      } as ScreenField);
       
       fields.push({ row: 10, col: 5, length: 15, value: 'Date of Birth:' });
       fields.push({
@@ -268,7 +268,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
         value: formData.dateOfBirth || '',
         isEditable: true,
         fieldName: 'dateOfBirth'
-      });
+      } as ScreenField);
       
       fields.push({ row: 11, col: 5, length: 15, value: 'Relationship:' });
       fields.push({
@@ -278,7 +278,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
         value: formData.relationship || '',
         isEditable: true,
         fieldName: 'relationship'
-      });
+      } as ScreenField);
       
       fields.push({ row: 12, col: 5, length: 15, value: 'Percentage:' });
       fields.push({
@@ -288,7 +288,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
         value: formData.percentage?.toString() || '0',
         isEditable: true,
         fieldName: 'percentage'
-      });
+      } as ScreenField);
       
       fields.push({ row: 14, col: 5, length: 40, value: 'Press Enter to save, F3 to cancel' });
     } else if (mode === BeneficiaryMode.DELETE) {

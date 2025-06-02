@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Terminal from '@/components/terminal/Terminal';
-import { ScreenConfig, FunctionKey, LoanQuote, LoanQuoteStatus } from '@/types';
+import { ScreenConfig, FunctionKey, LoanQuote, LoanQuoteStatus, ScreenField } from '@/types';
 import { 
   getPolicyByNumber, 
   getLoanQuotes, 
@@ -178,7 +178,7 @@ const LoanQuoteScreen: React.FC = () => {
           value: selectedIndex.toString(),
           isEditable: true,
           fieldName: 'selectedIndex'
-        });
+        } as ScreenField);
       }
     } else if (mode === LoanQuoteMode.GENERATE) {
       // Generate form
@@ -192,7 +192,7 @@ const LoanQuoteScreen: React.FC = () => {
         value: loanAmount.toString(),
         isEditable: true,
         fieldName: 'loanAmount'
-      });
+      } as ScreenField);
       
       fields.push({ row: 10, col: 5, length: 20, value: 'Loan Term (months):' });
       fields.push({
@@ -202,7 +202,7 @@ const LoanQuoteScreen: React.FC = () => {
         value: loanTerm.toString(),
         isEditable: true,
         fieldName: 'loanTerm'
-      });
+      } as ScreenField);
       
       fields.push({ row: 12, col: 5, length: 40, value: 'Common terms: 12 (1 year), 60 (5 years), 120 (10 years)' });
       fields.push({ row: 14, col: 5, length: 40, value: 'Press Enter to generate quote, F3 to cancel' });

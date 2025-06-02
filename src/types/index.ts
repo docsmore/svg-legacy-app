@@ -47,7 +47,7 @@ export interface Address {
   zipCode: string;
 }
 
-export interface ScreenField {
+export type ScreenField = {
   row: number;
   col: number;
   length: number;
