@@ -44,6 +44,18 @@ const PolicyDetailsScreen: React.FC = () => {
           setMessage('Policy details refreshed');
         }
       }
+    } else if (key === 'F7') {
+      // Manage beneficiaries
+      if (policy) {
+        router.push(`/beneficiary-management?policyNumber=${policy.policyNumber}`);
+      }
+    } else if (key === 'F8') {
+      // Loan quotes (only for paid plans)
+      if (policy && policy.isPaidPlan) {
+        router.push(`/loan-quote?policyNumber=${policy.policyNumber}`);
+      } else {
+        setMessage('Only paid plans are eligible for loans');
+      }
     }
   };
   
@@ -51,7 +63,9 @@ const PolicyDetailsScreen: React.FC = () => {
     { key: 'F1', description: 'Help', action: () => {} },
     { key: 'F3', description: 'Back', action: () => {} },
     { key: 'F4', description: 'Edit Policyholder', action: () => {} },
-    { key: 'F5', description: 'Refresh', action: () => {} }
+    { key: 'F5', description: 'Refresh', action: () => {} },
+    { key: 'F7', description: 'Beneficiaries', action: () => {} },
+    { key: 'F8', description: 'Loan Quotes', action: () => {} }
   ];
   
   const screenConfig: ScreenConfig = {
@@ -118,7 +132,7 @@ const PolicyDetailsScreen: React.FC = () => {
       },
       
       // Footer
-      { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Back  F4=Edit Policyholder  F5=Refresh', isHighlighted: true }
+      { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Back  F4=Edit Policyholder  F5=Refresh  F7=Beneficiaries  F8=Loan Quotes', isHighlighted: true }
     ],
     functionKeys
   };

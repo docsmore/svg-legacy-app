@@ -1,4 +1,4 @@
-import { Policy, PolicyStatus, ProductType, PolicyHolder, Address } from '@/types';
+import { Policy, PolicyStatus, ProductType, PolicyHolder, Address, Beneficiary, LoanQuote, LoanQuoteStatus } from '@/types';
 
 // Mock data for the policy administration system
 const mockPolicies: Policy[] = [
@@ -9,6 +9,7 @@ const mockPolicies: Policy[] = [
     expirationDate: '2025-01-01',
     premium: 1200.50,
     productType: ProductType.AUTO,
+    isPaidPlan: true,
     policyHolder: {
       id: 'PH001',
       firstName: 'John',
@@ -24,7 +25,28 @@ const mockPolicies: Policy[] = [
         state: 'IL',
         zipCode: '62701'
       }
-    }
+    },
+    beneficiaries: [
+      {
+        id: 'BEN001',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        dateOfBirth: '1982-08-20',
+        relationship: 'Spouse',
+        percentage: 75,
+        ssn: '234-56-7890',
+        email: 'jane.smith@example.com',
+        phone: '(555) 234-5678'
+      },
+      {
+        id: 'BEN002',
+        firstName: 'Michael',
+        lastName: 'Smith',
+        dateOfBirth: '2010-03-12',
+        relationship: 'Child',
+        percentage: 25
+      }
+    ]
   },
   {
     policyNumber: 'POL005678',
@@ -103,6 +125,7 @@ const mockPolicies: Policy[] = [
     expirationDate: '2024-05-10',
     premium: 1500.00,
     productType: ProductType.LIFE,
+    isPaidPlan: true,
     policyHolder: {
       id: 'PH005',
       firstName: 'Michael',
@@ -118,7 +141,36 @@ const mockPolicies: Policy[] = [
         state: 'MA',
         zipCode: '02108'
       }
-    }
+    },
+    beneficiaries: [
+      {
+        id: 'BEN003',
+        firstName: 'Elizabeth',
+        lastName: 'Brown',
+        dateOfBirth: '1972-11-18',
+        relationship: 'Spouse',
+        percentage: 50,
+        ssn: '456-78-9012',
+        email: 'elizabeth.brown@example.com',
+        phone: '(555) 456-7890'
+      },
+      {
+        id: 'BEN004',
+        firstName: 'Thomas',
+        lastName: 'Brown',
+        dateOfBirth: '2000-07-22',
+        relationship: 'Child',
+        percentage: 25
+      },
+      {
+        id: 'BEN005',
+        firstName: 'Emily',
+        lastName: 'Brown',
+        dateOfBirth: '2002-09-15',
+        relationship: 'Child',
+        percentage: 25
+      }
+    ]
   }
 ];
 
@@ -212,4 +264,180 @@ export const updatePolicyStatus = (
   mockPolicies[policyIndex] = updatedPolicy;
   
   return updatedPolicy;
+};
+
+// Mock loan quotes
+const mockLoanQuotes: LoanQuote[] = [
+  {
+    quoteId: 'LQ001',
+    policyNumber: 'POL001234',
+    requestDate: '2024-05-10',
+    loanAmount: 5000,
+    interestRate: 4.5,
+    monthlyPayment: 93.22,
+    term: 60, // 5 years
+    totalInterest: 591.20,
+    status: LoanQuoteStatus.APPROVED
+  },
+  {
+    quoteId: 'LQ002',
+    policyNumber: 'POL007890',
+    requestDate: '2024-05-15',
+    loanAmount: 10000,
+    interestRate: 5.2,
+    monthlyPayment: 189.99,
+    term: 60,
+    totalInterest: 1399.40,
+    status: LoanQuoteStatus.PENDING
+  }
+];
+
+// Beneficiary management functions
+export const getBeneficiaries = (policyNumber: string): Beneficiary[] => {
+  const policy = getPolicyByNumber(policyNumber);
+  return policy?.beneficiaries || [];
+};
+
+export const addBeneficiary = (policyNumber: string, beneficiary: Omit<Beneficiary, 'id'>): Beneficiary | undefined => {
+  const policyIndex = mockPolicies.findIndex(policy => policy.policyNumber === policyNumber);
+  
+  if (policyIndex === -1) {
+    return undefined;
+  }
+  
+  const newBeneficiary: Beneficiary = {
+    ...beneficiary,
+    id: `BEN${Math.floor(Math.random() * 10000).toString().padStart(3, '0')}` // Generate a random ID
+  };
+  
+  const updatedPolicy = {
+    ...mockPolicies[policyIndex],
+    beneficiaries: [...(mockPolicies[policyIndex].beneficiaries || []), newBeneficiary]
+  };
+  
+  mockPolicies[policyIndex] = updatedPolicy;
+  
+  return newBeneficiary;
+};
+
+export const updateBeneficiary = (
+  policyNumber: string,
+  beneficiaryId: string,
+  updatedBeneficiary: Partial<Beneficiary>
+): Beneficiary | undefined => {
+  const policyIndex = mockPolicies.findIndex(policy => policy.policyNumber === policyNumber);
+  
+  if (policyIndex === -1 || !mockPolicies[policyIndex].beneficiaries) {
+    return undefined;
+  }
+  
+  const beneficiaryIndex = mockPolicies[policyIndex].beneficiaries!.findIndex(
+    beneficiary => beneficiary.id === beneficiaryId
+  );
+  
+  if (beneficiaryIndex === -1) {
+    return undefined;
+  }
+  
+  const updatedBeneficiaryObj = {
+    ...mockPolicies[policyIndex].beneficiaries![beneficiaryIndex],
+    ...updatedBeneficiary
+  };
+  
+  const updatedBeneficiaries = [...mockPolicies[policyIndex].beneficiaries!];
+  updatedBeneficiaries[beneficiaryIndex] = updatedBeneficiaryObj;
+  
+  mockPolicies[policyIndex] = {
+    ...mockPolicies[policyIndex],
+    beneficiaries: updatedBeneficiaries
+  };
+  
+  return updatedBeneficiaryObj;
+};
+
+export const deleteBeneficiary = (policyNumber: string, beneficiaryId: string): boolean => {
+  const policyIndex = mockPolicies.findIndex(policy => policy.policyNumber === policyNumber);
+  
+  if (policyIndex === -1 || !mockPolicies[policyIndex].beneficiaries) {
+    return false;
+  }
+  
+  const beneficiaryIndex = mockPolicies[policyIndex].beneficiaries!.findIndex(
+    beneficiary => beneficiary.id === beneficiaryId
+  );
+  
+  if (beneficiaryIndex === -1) {
+    return false;
+  }
+  
+  const updatedBeneficiaries = mockPolicies[policyIndex].beneficiaries!.filter(
+    beneficiary => beneficiary.id !== beneficiaryId
+  );
+  
+  mockPolicies[policyIndex] = {
+    ...mockPolicies[policyIndex],
+    beneficiaries: updatedBeneficiaries
+  };
+  
+  return true;
+};
+
+// Loan quote functions
+export const getLoanQuotes = (policyNumber: string): LoanQuote[] => {
+  return mockLoanQuotes.filter(quote => quote.policyNumber === policyNumber);
+};
+
+export const getLoanQuoteById = (quoteId: string): LoanQuote | undefined => {
+  return mockLoanQuotes.find(quote => quote.quoteId === quoteId);
+};
+
+export const generateLoanQuote = (policyNumber: string, loanAmount: number, term: number): LoanQuote | undefined => {
+  const policy = getPolicyByNumber(policyNumber);
+  
+  if (!policy || !policy.isPaidPlan) {
+    return undefined; // Only paid plans are eligible for loans
+  }
+  
+  // Generate a random interest rate between 3.5% and 6.5%
+  const interestRate = 3.5 + Math.random() * 3;
+  
+  // Calculate monthly payment using the formula: P * r * (1+r)^n / ((1+r)^n - 1)
+  // Where P is principal, r is monthly interest rate, n is number of months
+  const monthlyInterestRate = interestRate / 100 / 12;
+  const monthlyPayment = loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, term) / 
+                        (Math.pow(1 + monthlyInterestRate, term) - 1);
+  
+  // Calculate total interest
+  const totalInterest = (monthlyPayment * term) - loanAmount;
+  
+  const newQuote: LoanQuote = {
+    quoteId: `LQ${Math.floor(Math.random() * 10000).toString().padStart(3, '0')}`,
+    policyNumber,
+    requestDate: new Date().toISOString().split('T')[0],
+    loanAmount,
+    interestRate: parseFloat(interestRate.toFixed(2)),
+    monthlyPayment: parseFloat(monthlyPayment.toFixed(2)),
+    term,
+    totalInterest: parseFloat(totalInterest.toFixed(2)),
+    status: LoanQuoteStatus.PENDING
+  };
+  
+  mockLoanQuotes.push(newQuote);
+  
+  return newQuote;
+};
+
+export const updateLoanQuoteStatus = (quoteId: string, status: LoanQuoteStatus): LoanQuote | undefined => {
+  const quoteIndex = mockLoanQuotes.findIndex(quote => quote.quoteId === quoteId);
+  
+  if (quoteIndex === -1) {
+    return undefined;
+  }
+  
+  mockLoanQuotes[quoteIndex] = {
+    ...mockLoanQuotes[quoteIndex],
+    status
+  };
+  
+  return mockLoanQuotes[quoteIndex];
 };

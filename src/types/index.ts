@@ -8,6 +8,8 @@ export interface Policy {
   premium: number;
   productType: ProductType;
   policyHolder: PolicyHolder;
+  beneficiaries?: Beneficiary[];
+  isPaidPlan?: boolean;
 }
 
 export enum PolicyStatus {
@@ -49,7 +51,7 @@ export interface ScreenField {
   row: number;
   col: number;
   length: number;
-  value: string;
+  value: string | any;
   isEditable?: boolean;
   isHighlighted?: boolean;
   fieldName?: string;
@@ -71,4 +73,35 @@ export interface NavigationState {
   currentScreen: string;
   previousScreen?: string;
   screenStack: string[];
+}
+
+export interface Beneficiary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  relationship: string;
+  percentage: number;
+  ssn?: string;
+  email?: string;
+  phone?: string;
+  address?: Address;
+}
+
+export interface LoanQuote {
+  quoteId: string;
+  policyNumber: string;
+  requestDate: string;
+  loanAmount: number;
+  interestRate: number;
+  monthlyPayment: number;
+  term: number; // in months
+  totalInterest: number;
+  status: LoanQuoteStatus;
+}
+
+export enum LoanQuoteStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED'
 }
