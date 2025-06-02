@@ -3,13 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Terminal from '@/components/terminal/Terminal';
-import { ScreenConfig, FunctionKey, LoanQuote, LoanQuoteStatus, ScreenField } from '@/types';
+import { ScreenConfig, FunctionKey, LoanQuote, ScreenField } from '@/types';
 import { 
   getPolicyByNumber, 
   getLoanQuotes, 
-  getLoanQuoteById,
-  generateLoanQuote,
-  updateLoanQuoteStatus
+  generateLoanQuote
 } from '@/services/mockDataService';
 
 enum LoanQuoteMode {

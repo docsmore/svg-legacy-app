@@ -51,7 +51,8 @@ export type ScreenField = {
   row: number;
   col: number;
   length: number;
-  value: string | any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: string | any; // Using any for compatibility with existing code
   isEditable?: boolean;
   isHighlighted?: boolean;
   fieldName?: string;
