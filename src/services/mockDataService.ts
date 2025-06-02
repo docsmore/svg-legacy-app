@@ -441,3 +441,20 @@ export const updateLoanQuoteStatus = (quoteId: string, status: LoanQuoteStatus):
   
   return mockLoanQuotes[quoteIndex];
 };
+
+// Policy creation function
+export const createPolicy = (newPolicy: Omit<Policy, 'policyNumber'>): Policy => {
+  // Generate a unique policy number
+  const policyNumber = `POL${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+  
+  // Create the complete policy object
+  const policy: Policy = {
+    ...newPolicy,
+    policyNumber
+  };
+  
+  // Add to mock policies array
+  mockPolicies.push(policy);
+  
+  return policy;
+};

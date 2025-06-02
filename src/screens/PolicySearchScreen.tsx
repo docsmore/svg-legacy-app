@@ -35,6 +35,9 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
     } else if (key === 'F5') {
       // Refresh/clear search
       clearSearch();
+    } else if (key === 'F7') {
+      // Create a new policy
+      router.push('/policy-create');
     }
   };
 
@@ -93,6 +96,7 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
     { key: 'F1', description: 'Help', action: () => {} },
     { key: 'F3', description: 'Exit', action: () => {} },
     { key: 'F5', description: 'Refresh', action: () => {} },
+    { key: 'F7', description: 'New Policy', action: () => {} },
     { key: 'Enter', description: 'Search/Select', action: () => {} }
   ];
 
@@ -190,7 +194,7 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
       },
       
       // Footer
-      { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Exit  F5=Refresh  Enter=Search/Select', isHighlighted: true }
+      { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Exit  F5=Refresh  F7=New Policy  Enter=Search/Select', isHighlighted: true }
     ],
     functionKeys
   };
