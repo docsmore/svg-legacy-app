@@ -74,6 +74,9 @@ const BeneficiaryManagementScreen: React.FC = () => {
   };
 
   const handleEnterKey = () => {
+    console.log('Enter key pressed in mode:', mode);
+    console.log('Current form data:', formData);
+    
     if (mode === BeneficiaryMode.LIST && selectedIndex >= 0 && selectedIndex < beneficiaries.length) {
       // View/edit selected beneficiary
       setSelectedBeneficiary(beneficiaries[selectedIndex]);
@@ -82,18 +85,35 @@ const BeneficiaryManagementScreen: React.FC = () => {
       setMessage(`Editing beneficiary: ${beneficiaries[selectedIndex].firstName} ${beneficiaries[selectedIndex].lastName}`);
     } else if (mode === BeneficiaryMode.ADD) {
       // Add new beneficiary
+      console.log('Adding new beneficiary with data:', formData);
       if (validateBeneficiaryForm()) {
-        const newBeneficiary = addBeneficiary(policyNumber, formData as Omit<Beneficiary, 'id'>);
+        // Ensure all required fields are present
+        const beneficiaryData: Omit<Beneficiary, 'id'> = {
+          firstName: formData.firstName || '',
+          lastName: formData.lastName || '',
+          dateOfBirth: formData.dateOfBirth || '',
+          relationship: formData.relationship || '',
+          percentage: formData.percentage || 0,
+          // Optional fields
+          ssn: formData.ssn,
+          email: formData.email,
+          phone: formData.phone
+        };
+        
+        const newBeneficiary = addBeneficiary(policyNumber, beneficiaryData);
         if (newBeneficiary) {
+          console.log('Beneficiary added successfully:', newBeneficiary);
           setBeneficiaries([...beneficiaries, newBeneficiary]);
           setMode(BeneficiaryMode.LIST);
           setMessage(`Beneficiary ${newBeneficiary.firstName} ${newBeneficiary.lastName} added successfully`);
         } else {
+          console.error('Failed to add beneficiary');
           setMessage('Failed to add beneficiary');
         }
       }
     } else if (mode === BeneficiaryMode.EDIT) {
       // Update beneficiary
+      console.log('Updating beneficiary with data:', formData);
       if (validateBeneficiaryForm() && selectedBeneficiary) {
         const updatedBeneficiary = updateBeneficiary(
           policyNumber,
@@ -101,6 +121,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
           formData
         );
         if (updatedBeneficiary) {
+          console.log('Beneficiary updated successfully:', updatedBeneficiary);
           const updatedList = beneficiaries.map((b: Beneficiary) => 
             b.id === updatedBeneficiary.id ? updatedBeneficiary : b
           );
@@ -108,18 +129,22 @@ const BeneficiaryManagementScreen: React.FC = () => {
           setMode(BeneficiaryMode.LIST);
           setMessage(`Beneficiary ${updatedBeneficiary.firstName} ${updatedBeneficiary.lastName} updated successfully`);
         } else {
+          console.error('Failed to update beneficiary');
           setMessage('Failed to update beneficiary');
         }
       }
     } else if (mode === BeneficiaryMode.DELETE && selectedBeneficiary) {
       // Confirm deletion
+      console.log('Deleting beneficiary:', selectedBeneficiary);
       const success: boolean = deleteBeneficiary(policyNumber, selectedBeneficiary.id);
       if (success) {
+        console.log('Beneficiary deleted successfully');
         const updatedList: Beneficiary[] = beneficiaries.filter((b: Beneficiary) => b.id !== selectedBeneficiary.id);
         setBeneficiaries(updatedList);
         setMode(BeneficiaryMode.LIST);
         setMessage(`Beneficiary ${selectedBeneficiary.firstName} ${selectedBeneficiary.lastName} deleted successfully`);
       } else {
+        console.error('Failed to delete beneficiary');
         setMessage('Failed to delete beneficiary');
       }
       setSelectedBeneficiary(null);
@@ -168,6 +193,9 @@ const BeneficiaryManagementScreen: React.FC = () => {
           [fieldName]: value
         });
       }
+      
+      // Log the updated form data for debugging
+      console.log('Updated form data:', { ...formData, [fieldName]: fieldName === 'percentage' ? parseFloat(value) || 0 : value });
     }
   };
 
