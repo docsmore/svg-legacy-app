@@ -51,6 +51,12 @@ const BeneficiaryManagementScreen: React.FC = () => {
     if (key === 'F3') {
       // Return to policy details
       router.push(`/policy-details?policyNumber=${policyNumber}`);
+    } else if (key === 'F4') {
+      // Save beneficiary (in ADD or EDIT mode)
+      if (mode === BeneficiaryMode.ADD || mode === BeneficiaryMode.EDIT) {
+        console.log('F4 pressed - Saving beneficiary');
+        handleSaveBeneficiary();
+      }
     } else if (key === 'F5') {
       // Refresh beneficiary list
       const beneficiaryList = getBeneficiaries(policyNumber);
@@ -69,23 +75,18 @@ const BeneficiaryManagementScreen: React.FC = () => {
       });
       setMessage('Enter new beneficiary details');
     } else if (key === 'Enter') {
-      handleEnterKey();
+      // Enter key will still work for navigation and selection
+      if (mode === BeneficiaryMode.LIST) {
+        handleEnterKey();
+      }
     }
   };
-
-  const handleEnterKey = () => {
-    console.log('Enter key pressed in mode:', mode);
-    console.log('Current form data:', formData);
-    
-    if (mode === BeneficiaryMode.LIST && selectedIndex >= 0 && selectedIndex < beneficiaries.length) {
-      // View/edit selected beneficiary
-      setSelectedBeneficiary(beneficiaries[selectedIndex]);
-      setFormData({...beneficiaries[selectedIndex]});
-      setMode(BeneficiaryMode.EDIT);
-      setMessage(`Editing beneficiary: ${beneficiaries[selectedIndex].firstName} ${beneficiaries[selectedIndex].lastName}`);
-    } else if (mode === BeneficiaryMode.ADD) {
+  
+  // New function to handle saving beneficiary data
+  const handleSaveBeneficiary = () => {
+    if (mode === BeneficiaryMode.ADD) {
       // Add new beneficiary
-      console.log('Adding new beneficiary with data:', formData);
+      console.log('Saving new beneficiary with data:', formData);
       if (validateBeneficiaryForm()) {
         // Ensure all required fields are present
         const beneficiaryData: Omit<Beneficiary, 'id'> = {
@@ -111,10 +112,10 @@ const BeneficiaryManagementScreen: React.FC = () => {
           setMessage('Failed to add beneficiary');
         }
       }
-    } else if (mode === BeneficiaryMode.EDIT) {
+    } else if (mode === BeneficiaryMode.EDIT && selectedBeneficiary) {
       // Update beneficiary
-      console.log('Updating beneficiary with data:', formData);
-      if (validateBeneficiaryForm() && selectedBeneficiary) {
+      console.log('Saving updated beneficiary with data:', formData);
+      if (validateBeneficiaryForm()) {
         const updatedBeneficiary = updateBeneficiary(
           policyNumber,
           selectedBeneficiary.id,
@@ -133,6 +134,18 @@ const BeneficiaryManagementScreen: React.FC = () => {
           setMessage('Failed to update beneficiary');
         }
       }
+    }
+  };
+
+  const handleEnterKey = () => {
+    console.log('Enter key pressed in mode:', mode);
+    
+    if (mode === BeneficiaryMode.LIST && selectedIndex >= 0 && selectedIndex < beneficiaries.length) {
+      // View/edit selected beneficiary
+      setSelectedBeneficiary(beneficiaries[selectedIndex]);
+      setFormData({...beneficiaries[selectedIndex]});
+      setMode(BeneficiaryMode.EDIT);
+      setMessage(`Editing beneficiary: ${beneficiaries[selectedIndex].firstName} ${beneficiaries[selectedIndex].lastName}`);
     } else if (mode === BeneficiaryMode.DELETE && selectedBeneficiary) {
       // Confirm deletion
       console.log('Deleting beneficiary:', selectedBeneficiary);
@@ -149,6 +162,7 @@ const BeneficiaryManagementScreen: React.FC = () => {
       }
       setSelectedBeneficiary(null);
     }
+    // Note: ADD and EDIT modes now use F4 for saving instead of Enter
   };
 
   const validateBeneficiaryForm = (): boolean => {
@@ -204,6 +218,11 @@ const BeneficiaryManagementScreen: React.FC = () => {
     { key: 'F3', description: 'Back', action: () => {} },
     { key: 'F5', description: 'Refresh', action: () => {} }
   ];
+
+  // Add F4 Save option in ADD and EDIT modes
+  if (mode === BeneficiaryMode.ADD || mode === BeneficiaryMode.EDIT) {
+    functionKeys.push({ key: 'F4', description: 'Save', action: () => {} });
+  }
 
   if (mode === BeneficiaryMode.LIST) {
     functionKeys.push({ key: 'F6', description: 'Add New', action: () => {} });
