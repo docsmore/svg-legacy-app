@@ -1,4 +1,4 @@
-# SVG Legacy App - AS/400 Style Policy Administration System
+# Solvrays Legacy App Simulation - AS/400 Style Policy Administration System
 
 This is a modern web application that emulates the look and feel of a legacy AS/400 green screen terminal interface for a comprehensive policy administration system.
 
