@@ -106,20 +106,35 @@ const LoanQuoteScreen: React.FC = () => {
 
   const handleFieldChange = (fieldName: string, value: string) => {
     if (mode === LoanQuoteMode.LIST && fieldName === 'selectedIndex') {
-      const index = parseInt(value, 10);
-      if (!isNaN(index) && index >= 0 && index < loanQuotes.length) {
-        setSelectedIndex(index);
+      // Allow empty string or valid number
+      if (value === '') {
+        setSelectedIndex(0);
+      } else {
+        const index = parseInt(value, 10);
+        if (!isNaN(index)) {
+          setSelectedIndex(index);
+        }
       }
     } else if (mode === LoanQuoteMode.GENERATE) {
       if (fieldName === 'loanAmount') {
-        const amount = parseFloat(value);
-        if (!isNaN(amount)) {
-          setLoanAmount(amount);
+        // Allow empty string or any numeric input (including partial like "50")
+        if (value === '') {
+          setLoanAmount(0);
+        } else {
+          const amount = parseFloat(value);
+          if (!isNaN(amount)) {
+            setLoanAmount(amount);
+          }
         }
       } else if (fieldName === 'loanTerm') {
-        const term = parseInt(value, 10);
-        if (!isNaN(term)) {
-          setLoanTerm(term);
+        // Allow empty string or any numeric input
+        if (value === '') {
+          setLoanTerm(0);
+        } else {
+          const term = parseInt(value, 10);
+          if (!isNaN(term)) {
+            setLoanTerm(term);
+          }
         }
       }
     }

@@ -405,9 +405,10 @@ export const searchPoliciesAdvanced = (filters: {
 
   // Apply expiring soon filter
   if (filters.expiringWithinDays !== undefined) {
+    const expiringDays = filters.expiringWithinDays;
     results = results.filter(policy => {
       const daysUntilExp = getDaysUntilExpiration(policy.expirationDate);
-      return daysUntilExp >= 0 && daysUntilExp <= filters.expiringWithinDays;
+      return daysUntilExp >= 0 && daysUntilExp <= expiringDays;
     });
   }
 
