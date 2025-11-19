@@ -10,6 +10,7 @@ export interface Policy {
   policyHolder: PolicyHolder;
   beneficiaries?: Beneficiary[];
   isPaidPlan?: boolean;
+  notes?: string; // For renewal blockers and special conditions
 }
 
 export enum PolicyStatus {

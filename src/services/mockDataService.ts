@@ -1,5 +1,13 @@
 import { Policy, PolicyStatus, ProductType, PolicyHolder, Address, Beneficiary, LoanQuote, LoanQuoteStatus } from '@/types';
 
+// Helper function to calculate days until expiration
+const getDaysUntilExpiration = (expirationDate: string): number => {
+  const today = new Date();
+  const expDate = new Date(expirationDate);
+  const diffTime = expDate.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
 // Mock data for the policy administration system
 const mockPolicies: Policy[] = [
   {
@@ -171,6 +179,151 @@ const mockPolicies: Policy[] = [
         percentage: 25
       }
     ]
+  },
+  // HOME policies with expiration scenarios
+  {
+    policyNumber: 'POL010111',
+    status: PolicyStatus.ACTIVE,
+    effectiveDate: '2024-01-01',
+    expirationDate: '2025-12-31', // Expiring soon (within 30 days from now)
+    premium: 1850.00,
+    productType: ProductType.HOME,
+    policyHolder: {
+      id: 'PH006',
+      firstName: 'Patricia',
+      lastName: 'Martinez',
+      dateOfBirth: '1978-04-12',
+      ssn: '567-89-0123',
+      email: 'patricia.martinez@example.com',
+      phone: '(555) 567-8901',
+      address: {
+        street1: '890 Elm Street',
+        city: 'Austin',
+        state: 'TX',
+        zipCode: '78701'
+      }
+    },
+    notes: 'RENEWAL BLOCKER: Property has open claim for roof damage. Requires inspection before renewal.'
+  },
+  {
+    policyNumber: 'POL012345',
+    status: PolicyStatus.ACTIVE,
+    effectiveDate: '2023-12-15',
+    expirationDate: '2024-12-15', // Already expired
+    premium: 2200.00,
+    productType: ProductType.HOME,
+    policyHolder: {
+      id: 'PH007',
+      firstName: 'David',
+      lastName: 'Anderson',
+      dateOfBirth: '1965-09-18',
+      ssn: '678-90-1234',
+      email: 'david.anderson@example.com',
+      phone: '(555) 678-9012',
+      address: {
+        street1: '234 Highland Ave',
+        city: 'Denver',
+        state: 'CO',
+        zipCode: '80202'
+      }
+    },
+    notes: 'RENEWAL BLOCKER: Property located in newly designated flood zone. Requires flood insurance addendum.'
+  },
+  {
+    policyNumber: 'POL013579',
+    status: PolicyStatus.ACTIVE,
+    effectiveDate: '2024-02-01',
+    expirationDate: '2025-01-15', // Expiring in ~15 days
+    premium: 1650.00,
+    productType: ProductType.HOME,
+    policyHolder: {
+      id: 'PH008',
+      firstName: 'Linda',
+      lastName: 'Thompson',
+      dateOfBirth: '1972-11-25',
+      ssn: '789-01-2345',
+      email: 'linda.thompson@example.com',
+      phone: '(555) 789-0123',
+      address: {
+        street1: '567 Sunset Blvd',
+        city: 'Los Angeles',
+        state: 'CA',
+        zipCode: '90028'
+      }
+    },
+    notes: 'RENEWAL BLOCKER: Property has unpaid premium balance of $825. Payment required before renewal.'
+  },
+  {
+    policyNumber: 'POL014680',
+    status: PolicyStatus.EXPIRED,
+    effectiveDate: '2023-06-01',
+    expirationDate: '2024-06-01', // Expired 6 months ago
+    premium: 1975.00,
+    productType: ProductType.HOME,
+    policyHolder: {
+      id: 'PH009',
+      firstName: 'James',
+      lastName: 'Wilson',
+      dateOfBirth: '1980-02-14',
+      ssn: '890-12-3456',
+      email: 'james.wilson@example.com',
+      phone: '(555) 890-1234',
+      address: {
+        street1: '789 Riverside Dr',
+        city: 'Seattle',
+        state: 'WA',
+        zipCode: '98101'
+      }
+    },
+    notes: 'RENEWAL BLOCKER: Property has 3 claims in past 12 months. Requires underwriting review and possible rate adjustment.'
+  },
+  {
+    policyNumber: 'POL015791',
+    status: PolicyStatus.ACTIVE,
+    effectiveDate: '2024-03-01',
+    expirationDate: '2025-01-05', // Expiring in ~5 days
+    premium: 2100.00,
+    productType: ProductType.HOME,
+    policyHolder: {
+      id: 'PH010',
+      firstName: 'Maria',
+      lastName: 'Garcia',
+      dateOfBirth: '1985-07-30',
+      ssn: '901-23-4567',
+      email: 'maria.garcia@example.com',
+      phone: '(555) 901-2345',
+      address: {
+        street1: '321 Ocean View',
+        city: 'Miami',
+        state: 'FL',
+        zipCode: '33101'
+      }
+    },
+    notes: 'RENEWAL BLOCKER: Property inspection reveals outdated electrical system. Upgrade required for renewal.'
+  },
+  {
+    policyNumber: 'POL016802',
+    status: PolicyStatus.ACTIVE,
+    effectiveDate: '2024-01-10',
+    expirationDate: '2025-02-28', // Expiring in ~60 days
+    premium: 1725.00,
+    productType: ProductType.HOME,
+    policyHolder: {
+      id: 'PH011',
+      firstName: 'Christopher',
+      lastName: 'Lee',
+      dateOfBirth: '1976-12-05',
+      ssn: '012-34-5678',
+      email: 'christopher.lee@example.com',
+      phone: '(555) 012-3456',
+      address: {
+        street1: '456 Mountain View',
+        city: 'Phoenix',
+        state: 'AZ',
+        zipCode: '85001'
+      }
+    },
+    notes: 'RENEWAL BLOCKER: Property has swimming pool without required safety fence. Compliance needed for renewal.'
   }
 ];
 
@@ -191,6 +344,79 @@ export const searchPolicies = (searchTerm: string): Policy[] => {
     policy.policyHolder.lastName.toLowerCase().includes(term) ||
     policy.policyHolder.id.toLowerCase().includes(term)
   );
+};
+
+// Search for expired policies
+export const getExpiredPolicies = (): Policy[] => {
+  return mockPolicies.filter(policy => {
+    const daysUntilExp = getDaysUntilExpiration(policy.expirationDate);
+    return daysUntilExp < 0 || policy.status === PolicyStatus.EXPIRED;
+  });
+};
+
+// Search for policies expiring soon (within specified days)
+export const getExpiringPolicies = (daysThreshold: number = 30): Policy[] => {
+  return mockPolicies.filter(policy => {
+    const daysUntilExp = getDaysUntilExpiration(policy.expirationDate);
+    return daysUntilExp >= 0 && daysUntilExp <= daysThreshold && policy.status === PolicyStatus.ACTIVE;
+  });
+};
+
+// Get policies by product type
+export const getPoliciesByType = (productType: ProductType): Policy[] => {
+  return mockPolicies.filter(policy => policy.productType === productType);
+};
+
+// Get policies with renewal blockers (have notes)
+export const getPoliciesWithRenewalBlockers = (): Policy[] => {
+  return mockPolicies.filter(policy => policy.notes && policy.notes.includes('RENEWAL BLOCKER'));
+};
+
+// Advanced search with filters
+export const searchPoliciesAdvanced = (filters: {
+  searchTerm?: string;
+  status?: PolicyStatus;
+  productType?: ProductType;
+  expiringWithinDays?: number;
+  hasRenewalBlockers?: boolean;
+}): Policy[] => {
+  let results = mockPolicies;
+
+  // Apply search term filter
+  if (filters.searchTerm) {
+    const term = filters.searchTerm.toLowerCase();
+    results = results.filter(policy => 
+      policy.policyNumber.toLowerCase().includes(term) ||
+      policy.policyHolder.firstName.toLowerCase().includes(term) ||
+      policy.policyHolder.lastName.toLowerCase().includes(term) ||
+      policy.policyHolder.id.toLowerCase().includes(term)
+    );
+  }
+
+  // Apply status filter
+  if (filters.status) {
+    results = results.filter(policy => policy.status === filters.status);
+  }
+
+  // Apply product type filter
+  if (filters.productType) {
+    results = results.filter(policy => policy.productType === filters.productType);
+  }
+
+  // Apply expiring soon filter
+  if (filters.expiringWithinDays !== undefined) {
+    results = results.filter(policy => {
+      const daysUntilExp = getDaysUntilExpiration(policy.expirationDate);
+      return daysUntilExp >= 0 && daysUntilExp <= filters.expiringWithinDays;
+    });
+  }
+
+  // Apply renewal blockers filter
+  if (filters.hasRenewalBlockers) {
+    results = results.filter(policy => policy.notes && policy.notes.includes('RENEWAL BLOCKER'));
+  }
+
+  return results;
 };
 
 export const updatePolicyHolder = (policyNumber: string, policyHolder: PolicyHolder): Policy | undefined => {

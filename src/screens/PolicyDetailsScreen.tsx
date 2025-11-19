@@ -49,6 +49,11 @@ const PolicyDetailsScreen: React.FC = () => {
       if (policy) {
         router.push(`/beneficiary-management?policyNumber=${policy.policyNumber}`);
       }
+    } else if (key === 'F6') {
+      // Renew policy
+      if (policy) {
+        router.push(`/policy-renewal?policyNumber=${policy.policyNumber}`);
+      }
     } else if (key === 'F8') {
       // Loan quotes (only for paid plans)
       if (policy && policy.isPaidPlan) {
@@ -64,6 +69,7 @@ const PolicyDetailsScreen: React.FC = () => {
     { key: 'F3', description: 'Back', action: () => {} },
     { key: 'F4', description: 'Edit Policyholder', action: () => {} },
     { key: 'F5', description: 'Refresh', action: () => {} },
+    { key: 'F6', description: 'Renew Policy', action: () => {} },
     { key: 'F7', description: 'Beneficiaries', action: () => {} },
     { key: 'F8', description: 'Loan Quotes', action: () => {} }
   ];
