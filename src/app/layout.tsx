@@ -25,8 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/images/logo.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://res.cloudinary.com/dqql2wlbt/image/upload/v1741110204/solvrays-grayscale_kqvimw.svg" type="image/svg+xml" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
