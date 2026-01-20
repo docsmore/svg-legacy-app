@@ -18,7 +18,8 @@ export enum PolicyStatus {
   PENDING = 'PENDING',
   EXPIRED = 'EXPIRED',
   CANCELLED = 'CANCELLED',
-  RENEWED = 'RENEWED'
+  RENEWED = 'RENEWED',
+  SURRENDERED = 'SURRENDERED'
 }
 
 export enum ProductType {
@@ -106,4 +107,55 @@ export enum LoanQuoteStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED'
+}
+
+// Cash Value related types
+export interface CashValueDetails {
+  policyNumber: string;
+  currentCashValue: number;
+  surrenderValue: number;
+  surrenderCharges: number;
+  loanBalance: number;
+  netSurrenderValue: number;
+  accumulatedDividends: number;
+  paidUpAdditions: number;
+  guaranteedCashValue: number;
+  nonGuaranteedCashValue: number;
+  lastCalculatedDate: string;
+}
+
+export interface SurrenderRequest {
+  requestId: string;
+  policyNumber: string;
+  requestDate: string;
+  surrenderType: SurrenderType;
+  requestedAmount: number;
+  netPayoutAmount: number;
+  surrenderCharges: number;
+  taxWithholding: number;
+  status: SurrenderRequestStatus;
+  reason: string;
+  paymentMethod: PaymentMethod;
+  bankAccountLast4?: string;
+  processedDate?: string;
+  confirmationNumber?: string;
+}
+
+export enum SurrenderType {
+  FULL = 'FULL',
+  PARTIAL = 'PARTIAL'
+}
+
+export enum SurrenderRequestStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  REJECTED = 'REJECTED'
+}
+
+export enum PaymentMethod {
+  CHECK = 'CHECK',
+  ACH = 'ACH',
+  WIRE = 'WIRE'
 }

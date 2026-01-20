@@ -100,6 +100,9 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
     { key: 'Enter', description: 'Search/Select', action: () => {} }
   ];
 
+  // Calculate the row for selection input (after results, with some spacing)
+  const selectionInputRow = Math.max(12, 10 + searchResults.length + 1);
+
   // Dynamically generate search result fields
   const resultFields = searchResults.flatMap((policy, index) => {
     const rowIndex = 10 + index;
@@ -182,10 +185,10 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
       // Results will be dynamically added here
       ...resultFields,
       
-      // Selection input
-      { row: 20, col: 2, length: 30, value: 'Type number to select:' },
+      // Selection input (dynamically positioned below results)
+      { row: selectionInputRow, col: 2, length: 30, value: 'Type number to select:' },
       { 
-        row: 20, 
+        row: selectionInputRow, 
         col: 25, 
         length: 2, 
         value: selectedIndex >= 0 ? (selectedIndex + 1).toString() : '', 
@@ -193,8 +196,8 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
         fieldName: 'selectedIndex' 
       },
       
-      // Footer
-      { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Exit  F5=Refresh  F7=New Policy  Enter=Search/Select', isHighlighted: true }
+      // Footer (dynamically positioned below selection input)
+      { row: selectionInputRow + 2, col: 0, length: 80, value: 'F1=Help  F3=Exit  F5=Refresh  F7=New Policy  Enter=Search/Select', isHighlighted: true }
     ],
     functionKeys
   };

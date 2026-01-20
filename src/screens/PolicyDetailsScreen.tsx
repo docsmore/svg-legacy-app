@@ -61,6 +61,13 @@ const PolicyDetailsScreen: React.FC = () => {
       } else {
         setMessage('Only paid plans are eligible for loans');
       }
+    } else if (key === 'F10') {
+      // Cash Value / Surrender (only for life insurance paid plans)
+      if (policy && policy.productType === 'LIFE' && policy.isPaidPlan) {
+        router.push(`/cash-value?policyNumber=${policy.policyNumber}`);
+      } else {
+        setMessage('Cash value only available for paid life insurance policies');
+      }
     }
   };
   
@@ -71,7 +78,8 @@ const PolicyDetailsScreen: React.FC = () => {
     { key: 'F5', description: 'Refresh', action: () => {} },
     { key: 'F6', description: 'Renew Policy', action: () => {} },
     { key: 'F7', description: 'Beneficiaries', action: () => {} },
-    { key: 'F8', description: 'Loan Quotes', action: () => {} }
+    { key: 'F8', description: 'Loan Quotes', action: () => {} },
+    { key: 'F10', description: 'Cash Value', action: () => {} }
   ];
   
   const screenConfig: ScreenConfig = {
@@ -138,7 +146,7 @@ const PolicyDetailsScreen: React.FC = () => {
       },
       
       // Footer
-      { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Back  F4=Edit Policyholder  F5=Refresh  F7=Beneficiaries  F8=Loan Quotes', isHighlighted: true }
+      { row: 22, col: 0, length: 80, value: 'F1=Help F3=Back F4=Edit F5=Refresh F6=Renew F7=Benef F8=Loan F10=CashVal', isHighlighted: true }
     ],
     functionKeys
   };

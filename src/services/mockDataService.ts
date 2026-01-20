@@ -1,4 +1,18 @@
-import { Policy, PolicyStatus, ProductType, PolicyHolder, Address, Beneficiary, LoanQuote, LoanQuoteStatus } from '@/types';
+import { 
+  Policy, 
+  PolicyStatus, 
+  ProductType, 
+  PolicyHolder, 
+  Address, 
+  Beneficiary, 
+  LoanQuote, 
+  LoanQuoteStatus,
+  CashValueDetails,
+  SurrenderRequest,
+  SurrenderType,
+  SurrenderRequestStatus,
+  PaymentMethod
+} from '@/types';
 
 // Helper function to calculate days until expiration
 const getDaysUntilExpiration = (expirationDate: string): number => {
@@ -177,6 +191,44 @@ const mockPolicies: Policy[] = [
         dateOfBirth: '2002-09-15',
         relationship: 'Child',
         percentage: 25
+      }
+    ]
+  },
+  // LIFE policy with paid plan for testing F8 Loan Quotes and F10 Cash Value
+  {
+    policyNumber: 'POL999001',
+    status: PolicyStatus.ACTIVE,
+    effectiveDate: '2020-01-01',
+    expirationDate: '2050-01-01',
+    premium: 2500.00,
+    productType: ProductType.LIFE,
+    isPaidPlan: true,
+    policyHolder: {
+      id: 'PH099',
+      firstName: 'William',
+      lastName: 'Turner',
+      dateOfBirth: '1975-06-15',
+      ssn: '111-22-3333',
+      email: 'william.turner@example.com',
+      phone: '(555) 111-2222',
+      address: {
+        street1: '100 Life Insurance Way',
+        city: 'Hartford',
+        state: 'CT',
+        zipCode: '06103'
+      }
+    },
+    beneficiaries: [
+      {
+        id: 'BEN099',
+        firstName: 'Mary',
+        lastName: 'Turner',
+        dateOfBirth: '1978-03-20',
+        relationship: 'Spouse',
+        percentage: 100,
+        ssn: '222-33-4444',
+        email: 'mary.turner@example.com',
+        phone: '(555) 222-3333'
       }
     ]
   },
@@ -684,4 +736,214 @@ export const createPolicy = (newPolicy: Omit<Policy, 'policyNumber'>): Policy =>
   mockPolicies.push(policy);
   
   return policy;
+};
+
+// Mock cash value data for life insurance policies
+const mockCashValues: Map<string, CashValueDetails> = new Map([
+  ['POL001234', {
+    policyNumber: 'POL001234',
+    currentCashValue: 15750.00,
+    surrenderValue: 14875.50,
+    surrenderCharges: 874.50,
+    loanBalance: 0,
+    netSurrenderValue: 14875.50,
+    accumulatedDividends: 1250.00,
+    paidUpAdditions: 3500.00,
+    guaranteedCashValue: 12000.00,
+    nonGuaranteedCashValue: 3750.00,
+    lastCalculatedDate: new Date().toISOString().split('T')[0]
+  }],
+  ['POL007890', {
+    policyNumber: 'POL007890',
+    currentCashValue: 45000.00,
+    surrenderValue: 42750.00,
+    surrenderCharges: 2250.00,
+    loanBalance: 5000.00,
+    netSurrenderValue: 37750.00,
+    accumulatedDividends: 4500.00,
+    paidUpAdditions: 8750.00,
+    guaranteedCashValue: 35000.00,
+    nonGuaranteedCashValue: 10000.00,
+    lastCalculatedDate: new Date().toISOString().split('T')[0]
+  }]
+]);
+
+// Mock surrender requests
+const mockSurrenderRequests: SurrenderRequest[] = [];
+
+// Cash value functions
+export const getCashValueDetails = (policyNumber: string): CashValueDetails | undefined => {
+  const policy = getPolicyByNumber(policyNumber);
+  
+  // Only life insurance policies with paid plans have cash value
+  if (!policy || policy.productType !== ProductType.LIFE || !policy.isPaidPlan) {
+    return undefined;
+  }
+  
+  // Return existing cash value or generate mock data
+  if (mockCashValues.has(policyNumber)) {
+    return mockCashValues.get(policyNumber);
+  }
+  
+  // Generate mock cash value for eligible policies
+  const yearsActive = Math.max(1, Math.floor((new Date().getTime() - new Date(policy.effectiveDate).getTime()) / (365 * 24 * 60 * 60 * 1000)));
+  const baseCashValue = policy.premium * yearsActive * 0.6;
+  const surrenderCharges = baseCashValue * 0.05;
+  
+  const cashValue: CashValueDetails = {
+    policyNumber,
+    currentCashValue: parseFloat(baseCashValue.toFixed(2)),
+    surrenderValue: parseFloat((baseCashValue - surrenderCharges).toFixed(2)),
+    surrenderCharges: parseFloat(surrenderCharges.toFixed(2)),
+    loanBalance: 0,
+    netSurrenderValue: parseFloat((baseCashValue - surrenderCharges).toFixed(2)),
+    accumulatedDividends: parseFloat((baseCashValue * 0.08).toFixed(2)),
+    paidUpAdditions: parseFloat((baseCashValue * 0.15).toFixed(2)),
+    guaranteedCashValue: parseFloat((baseCashValue * 0.75).toFixed(2)),
+    nonGuaranteedCashValue: parseFloat((baseCashValue * 0.25).toFixed(2)),
+    lastCalculatedDate: new Date().toISOString().split('T')[0]
+  };
+  
+  mockCashValues.set(policyNumber, cashValue);
+  return cashValue;
+};
+
+export const calculateSurrenderValue = (
+  policyNumber: string,
+  surrenderType: SurrenderType,
+  partialAmount?: number
+): { grossAmount: number; surrenderCharges: number; taxWithholding: number; netAmount: number } | undefined => {
+  const cashValue = getCashValueDetails(policyNumber);
+  
+  if (!cashValue) {
+    return undefined;
+  }
+  
+  let grossAmount: number;
+  
+  if (surrenderType === SurrenderType.FULL) {
+    grossAmount = cashValue.currentCashValue;
+  } else {
+    // Partial surrender - use requested amount or 50% of cash value
+    grossAmount = Math.min(partialAmount || cashValue.currentCashValue * 0.5, cashValue.currentCashValue * 0.9);
+  }
+  
+  // Calculate charges (5% for full, 3% for partial)
+  const chargeRate = surrenderType === SurrenderType.FULL ? 0.05 : 0.03;
+  const surrenderCharges = grossAmount * chargeRate;
+  
+  // Calculate tax withholding (10% federal)
+  const taxWithholding = grossAmount * 0.10;
+  
+  const netAmount = grossAmount - surrenderCharges - taxWithholding;
+  
+  return {
+    grossAmount: parseFloat(grossAmount.toFixed(2)),
+    surrenderCharges: parseFloat(surrenderCharges.toFixed(2)),
+    taxWithholding: parseFloat(taxWithholding.toFixed(2)),
+    netAmount: parseFloat(netAmount.toFixed(2))
+  };
+};
+
+export const createSurrenderRequest = (
+  policyNumber: string,
+  surrenderType: SurrenderType,
+  requestedAmount: number,
+  reason: string,
+  paymentMethod: PaymentMethod,
+  bankAccountLast4?: string
+): SurrenderRequest | undefined => {
+  const calculation = calculateSurrenderValue(policyNumber, surrenderType, requestedAmount);
+  
+  if (!calculation) {
+    return undefined;
+  }
+  
+  const request: SurrenderRequest = {
+    requestId: `SR${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`,
+    policyNumber,
+    requestDate: new Date().toISOString().split('T')[0],
+    surrenderType,
+    requestedAmount: calculation.grossAmount,
+    netPayoutAmount: calculation.netAmount,
+    surrenderCharges: calculation.surrenderCharges,
+    taxWithholding: calculation.taxWithholding,
+    status: SurrenderRequestStatus.PENDING,
+    reason,
+    paymentMethod,
+    bankAccountLast4
+  };
+  
+  mockSurrenderRequests.push(request);
+  return request;
+};
+
+export const getSurrenderRequests = (policyNumber: string): SurrenderRequest[] => {
+  return mockSurrenderRequests.filter(req => req.policyNumber === policyNumber);
+};
+
+export const getSurrenderRequestById = (requestId: string): SurrenderRequest | undefined => {
+  return mockSurrenderRequests.find(req => req.requestId === requestId);
+};
+
+export const processSurrenderRequest = (
+  requestId: string,
+  approve: boolean
+): SurrenderRequest | undefined => {
+  const requestIndex = mockSurrenderRequests.findIndex(req => req.requestId === requestId);
+  
+  if (requestIndex === -1) {
+    return undefined;
+  }
+  
+  const request = mockSurrenderRequests[requestIndex];
+  
+  if (approve) {
+    request.status = SurrenderRequestStatus.APPROVED;
+    request.processedDate = new Date().toISOString().split('T')[0];
+    request.confirmationNumber = `CONF${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+    
+    // If full surrender, update policy status
+    if (request.surrenderType === SurrenderType.FULL) {
+      updatePolicyStatus(request.policyNumber, PolicyStatus.SURRENDERED);
+    }
+  } else {
+    request.status = SurrenderRequestStatus.REJECTED;
+    request.processedDate = new Date().toISOString().split('T')[0];
+  }
+  
+  mockSurrenderRequests[requestIndex] = request;
+  return request;
+};
+
+// Check if policy is eligible for surrender
+export const isPolicyEligibleForSurrender = (policyNumber: string): { eligible: boolean; reason?: string } => {
+  const policy = getPolicyByNumber(policyNumber);
+  
+  if (!policy) {
+    return { eligible: false, reason: 'Policy not found' };
+  }
+  
+  if (policy.productType !== ProductType.LIFE) {
+    return { eligible: false, reason: 'Only life insurance policies can be surrendered' };
+  }
+  
+  if (!policy.isPaidPlan) {
+    return { eligible: false, reason: 'Policy must be a paid plan to have cash value' };
+  }
+  
+  if (policy.status === PolicyStatus.SURRENDERED) {
+    return { eligible: false, reason: 'Policy has already been surrendered' };
+  }
+  
+  if (policy.status === PolicyStatus.CANCELLED) {
+    return { eligible: false, reason: 'Policy has been cancelled' };
+  }
+  
+  const cashValue = getCashValueDetails(policyNumber);
+  if (!cashValue || cashValue.currentCashValue <= 0) {
+    return { eligible: false, reason: 'Policy has no cash value' };
+  }
+  
+  return { eligible: true };
 };

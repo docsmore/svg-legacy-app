@@ -48,10 +48,38 @@ const Terminal: React.FC<TerminalProps> = ({
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Debug: log all key presses to help diagnose issues
+    console.log('Key pressed:', e.key, 'keyCode:', e.keyCode, 'code:', e.code);
+    
     // Handle function keys (F1-F24)
-    if (e.key.startsWith('F') && !isNaN(parseInt(e.key.substring(1)))) {
+    // Check for function keys by key code as well for better browser compatibility
+    const fKeyMatch = e.key.match(/^F(\d+)$/);
+    if (fKeyMatch) {
       e.preventDefault();
+      e.stopPropagation();
+      console.log('Function key detected via regex:', e.key);
       onKeyPress?.(e.key);
+      return;
+    }
+    
+    // Also handle by keyCode for browsers that don't report F10+ correctly
+    // F1=112, F2=113, ..., F10=121, F11=122, F12=123
+    if (e.keyCode >= 112 && e.keyCode <= 123) {
+      e.preventDefault();
+      e.stopPropagation();
+      const fKeyNum = e.keyCode - 111;
+      console.log('Function key detected via keyCode:', `F${fKeyNum}`);
+      onKeyPress?.(`F${fKeyNum}`);
+      return;
+    }
+    
+    // Also check e.code for function keys (more reliable on some systems)
+    const codeMatch = e.code?.match(/^F(\d+)$/);
+    if (codeMatch) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Function key detected via code:', e.code);
+      onKeyPress?.(e.code);
       return;
     }
 
@@ -383,7 +411,12 @@ const Terminal: React.FC<TerminalProps> = ({
       <div className="terminal-footer">
         <div className="function-keys">
           {screenConfig.functionKeys?.map((fKey, index) => (
-            <div key={`fkey-${index}`} className="function-key">
+            <div 
+              key={`fkey-${index}`} 
+              className="function-key"
+              onClick={() => onKeyPress?.(fKey.key)}
+              style={{ cursor: 'pointer' }}
+            >
               <span className="key-label">{fKey.key}</span>
               <span className="key-desc">{fKey.description}</span>
             </div>
