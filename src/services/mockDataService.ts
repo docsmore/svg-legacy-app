@@ -376,6 +376,91 @@ const mockPolicies: Policy[] = [
       }
     },
     notes: 'RENEWAL BLOCKER: Property has swimming pool without required safety fence. Compliance needed for renewal.'
+  },
+  // LIFE policies that have already been fully surrendered (policy no longer ACTIVE)
+  {
+    policyNumber: 'POL020001',
+    status: PolicyStatus.SURRENDERED,
+    effectiveDate: '2015-06-01',
+    expirationDate: '2045-06-01',
+    premium: 1800.00,
+    productType: ProductType.LIFE,
+    isPaidPlan: true,
+    policyHolder: {
+      id: 'PH020',
+      firstName: 'Barbara',
+      lastName: 'Coleman',
+      dateOfBirth: '1962-02-10',
+      ssn: '111-33-5555',
+      email: 'barbara.coleman@example.com',
+      phone: '(555) 111-3355',
+      address: {
+        street1: '78 Willow Creek Rd',
+        city: 'Nashville',
+        state: 'TN',
+        zipCode: '37201'
+      }
+    },
+    beneficiaries: [
+      {
+        id: 'BEN020',
+        firstName: 'Robert',
+        lastName: 'Coleman',
+        dateOfBirth: '1960-05-22',
+        relationship: 'Spouse',
+        percentage: 100,
+        ssn: '222-44-6666',
+        email: 'robert.coleman@example.com',
+        phone: '(555) 222-4466'
+      }
+    ],
+    notes: 'SURRENDERED: Full surrender processed 2025-06-15. Confirmation #CONF002001. Net payout $22,845.00 disbursed via CHECK.'
+  },
+  {
+    policyNumber: 'POL020002',
+    status: PolicyStatus.SURRENDERED,
+    effectiveDate: '2012-09-15',
+    expirationDate: '2042-09-15',
+    premium: 3200.00,
+    productType: ProductType.LIFE,
+    isPaidPlan: true,
+    policyHolder: {
+      id: 'PH021',
+      firstName: 'Harold',
+      lastName: 'Whitfield',
+      dateOfBirth: '1958-12-01',
+      ssn: '333-55-7777',
+      email: 'harold.whitfield@example.com',
+      phone: '(555) 333-5577',
+      address: {
+        street1: '910 Cedar Ridge Ln',
+        city: 'Charlotte',
+        state: 'NC',
+        zipCode: '28202'
+      }
+    },
+    beneficiaries: [
+      {
+        id: 'BEN021',
+        firstName: 'Diane',
+        lastName: 'Whitfield',
+        dateOfBirth: '1959-04-18',
+        relationship: 'Spouse',
+        percentage: 60,
+        ssn: '444-66-8888',
+        email: 'diane.whitfield@example.com',
+        phone: '(555) 444-6688'
+      },
+      {
+        id: 'BEN022',
+        firstName: 'Kevin',
+        lastName: 'Whitfield',
+        dateOfBirth: '1985-08-09',
+        relationship: 'Child',
+        percentage: 40
+      }
+    ],
+    notes: 'SURRENDERED: Full surrender processed 2025-02-28. Confirmation #CONF002002. Net payout $67,032.00 disbursed via WIRE. Reason: Replacing with different policy.'
   }
 ];
 
@@ -765,11 +850,69 @@ const mockCashValues: Map<string, CashValueDetails> = new Map([
     guaranteedCashValue: 35000.00,
     nonGuaranteedCashValue: 10000.00,
     lastCalculatedDate: new Date().toISOString().split('T')[0]
+  }],
+  // Fully surrendered policies retain a zeroed-out cash value record post-payout
+  ['POL020001', {
+    policyNumber: 'POL020001',
+    currentCashValue: 0.00,
+    surrenderValue: 0.00,
+    surrenderCharges: 0.00,
+    loanBalance: 0,
+    netSurrenderValue: 0.00,
+    accumulatedDividends: 0.00,
+    paidUpAdditions: 0.00,
+    guaranteedCashValue: 0.00,
+    nonGuaranteedCashValue: 0.00,
+    lastCalculatedDate: '2025-06-15'
+  }],
+  ['POL020002', {
+    policyNumber: 'POL020002',
+    currentCashValue: 0.00,
+    surrenderValue: 0.00,
+    surrenderCharges: 0.00,
+    loanBalance: 0,
+    netSurrenderValue: 0.00,
+    accumulatedDividends: 0.00,
+    paidUpAdditions: 0.00,
+    guaranteedCashValue: 0.00,
+    nonGuaranteedCashValue: 0.00,
+    lastCalculatedDate: '2025-02-28'
   }]
 ]);
 
-// Mock surrender requests
-const mockSurrenderRequests: SurrenderRequest[] = [];
+// Mock surrender requests (seeded with historical completed requests for already-surrendered policies)
+const mockSurrenderRequests: SurrenderRequest[] = [
+  {
+    requestId: 'SR002001',
+    policyNumber: 'POL020001',
+    requestDate: '2025-06-10',
+    surrenderType: SurrenderType.FULL,
+    requestedAmount: 24045.00,
+    netPayoutAmount: 22845.00,
+    surrenderCharges: 1202.25,
+    taxWithholding: 2404.50,
+    status: SurrenderRequestStatus.COMPLETED,
+    reason: 'Financial hardship',
+    paymentMethod: PaymentMethod.CHECK,
+    processedDate: '2025-06-15',
+    confirmationNumber: 'CONF002001'
+  },
+  {
+    requestId: 'SR002002',
+    policyNumber: 'POL020002',
+    requestDate: '2025-02-22',
+    surrenderType: SurrenderType.FULL,
+    requestedAmount: 70560.00,
+    netPayoutAmount: 67032.00,
+    surrenderCharges: 3528.00,
+    taxWithholding: 7056.00,
+    status: SurrenderRequestStatus.COMPLETED,
+    reason: 'Replacing with different policy',
+    paymentMethod: PaymentMethod.WIRE,
+    processedDate: '2025-02-28',
+    confirmationNumber: 'CONF002002'
+  }
+];
 
 // Cash value functions
 export const getCashValueDetails = (policyNumber: string): CashValueDetails | undefined => {
