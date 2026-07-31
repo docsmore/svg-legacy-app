@@ -464,6 +464,92 @@ const mockPolicies: Policy[] = [
   }
 ];
 
+// ────────────────────────────────────────────────────────────────────────────
+// Generated bulk data for realistic list/pagination behavior.
+// Deterministic (no RNG) so every run renders the same screens. Common
+// surnames repeat on purpose so searches like "smith" or "pol" span
+// multiple subfile pages.
+// ────────────────────────────────────────────────────────────────────────────
+const GENERATED_FIRST_NAMES = [
+  'James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda',
+  'David', 'Elizabeth', 'William', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica',
+  'Thomas', 'Karen', 'Charles', 'Nancy', 'Christopher', 'Lisa', 'Daniel', 'Betty',
+  'Matthew', 'Margaret', 'Anthony', 'Sandra', 'Mark', 'Ashley', 'Donald', 'Kimberly',
+  'Steven', 'Emily', 'Paul', 'Dorothy', 'Andrew', 'Michelle', 'Joshua', 'Carol'
+];
+const GENERATED_LAST_NAMES = [
+  'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
+  'Rodriguez', 'Martinez', 'Smith', 'Johnson', 'Hernandez', 'Lopez', 'Gonzalez',
+  'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Smith', 'Jackson', 'Martin',
+  'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Johnson',
+  'Ramirez', 'Lewis', 'Robinson', 'Walker', 'Young', 'Allen', 'King', 'Wright'
+];
+const GENERATED_STREETS = [
+  'Main St', 'Oak Ave', 'Maple Dr', 'Cedar Ln', 'Pine St', 'Elm St',
+  'Park Blvd', 'Lakeview Dr', 'Riverside Rd', 'Highland Ave', 'Walnut St', 'Chestnut Ct'
+];
+const GENERATED_CITIES: Array<[string, string, string]> = [
+  ['Springfield', 'IL', '62701'], ['Columbus', 'OH', '43215'], ['Austin', 'TX', '78701'],
+  ['Phoenix', 'AZ', '85001'], ['Denver', 'CO', '80202'], ['Nashville', 'TN', '37201'],
+  ['Portland', 'OR', '97205'], ['Atlanta', 'GA', '30303'], ['Madison', 'WI', '53703'],
+  ['Richmond', 'VA', '23219'], ['Boise', 'ID', '83702'], ['Des Moines', 'IA', '50309']
+];
+const GENERATED_PRODUCTS = [
+  ProductType.AUTO, ProductType.HOME, ProductType.LIFE, ProductType.AUTO,
+  ProductType.HOME, ProductType.HEALTH, ProductType.AUTO, ProductType.BUSINESS,
+  ProductType.LIFE, ProductType.HOME
+];
+const GENERATED_STATUSES = [
+  PolicyStatus.ACTIVE, PolicyStatus.ACTIVE, PolicyStatus.ACTIVE, PolicyStatus.PENDING,
+  PolicyStatus.ACTIVE, PolicyStatus.EXPIRED, PolicyStatus.ACTIVE, PolicyStatus.CANCELLED,
+  PolicyStatus.ACTIVE, PolicyStatus.ACTIVE
+];
+
+const buildGeneratedPolicies = (): Policy[] => {
+  const policies: Policy[] = [];
+  for (let i = 0; i < 45; i++) {
+    const firstName = GENERATED_FIRST_NAMES[i % GENERATED_FIRST_NAMES.length];
+    const lastName = GENERATED_LAST_NAMES[(i * 7 + 3) % GENERATED_LAST_NAMES.length];
+    const [city, state, zipCode] = GENERATED_CITIES[(i * 5 + 1) % GENERATED_CITIES.length];
+    const street = GENERATED_STREETS[(i * 3 + 2) % GENERATED_STREETS.length];
+    const productType = GENERATED_PRODUCTS[(i * 3 + 1) % GENERATED_PRODUCTS.length];
+    const status = GENERATED_STATUSES[(i * 7 + 2) % GENERATED_STATUSES.length];
+    const effectiveYear = 2022 + (i % 3);
+    const effectiveMonth = String((i % 12) + 1).padStart(2, '0');
+    const seq = String(i + 1).padStart(4, '0');
+    const ssnArea = 100 + ((i * 37) % 800);
+
+    policies.push({
+      policyNumber: `POL1${String(10000 + i * 137).slice(-5)}`,
+      status,
+      effectiveDate: `${effectiveYear}-${effectiveMonth}-01`,
+      expirationDate: `${effectiveYear + 1}-${effectiveMonth}-01`,
+      premium: Math.round((450 + ((i * 173) % 3200) + (i % 100) / 100) * 100) / 100,
+      productType,
+      isPaidPlan: productType === ProductType.LIFE && i % 4 === 0,
+      policyHolder: {
+        id: `PHG${seq}`,
+        firstName,
+        lastName,
+        dateOfBirth: `${1945 + (i * 3) % 55}-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
+        ssn: `${ssnArea}-${String(10 + (i % 89))}-${String(1000 + ((i * 613) % 9000))}`,
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@example.com`,
+        phone: `(555) ${String(200 + (i % 799))}-${String(1000 + ((i * 389) % 9000))}`,
+        address: {
+          street1: `${100 + ((i * 91) % 8900)} ${street}`,
+          ...(i % 5 === 0 ? { street2: `Unit ${(i % 40) + 1}` } : {}),
+          city,
+          state,
+          zipCode
+        }
+      }
+    });
+  }
+  return policies;
+};
+
+mockPolicies.push(...buildGeneratedPolicies());
+
 // Service functions
 export const getPolicies = (): Policy[] => {
   return mockPolicies;

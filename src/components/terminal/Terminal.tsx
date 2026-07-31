@@ -93,6 +93,16 @@ const Terminal: React.FC<TerminalProps> = ({
         e.preventDefault();
         onKeyPress?.('Escape');
         break;
+      case 'PageDown':
+        // TN5250 Roll Up — next page of a subfile/list
+        e.preventDefault();
+        onKeyPress?.('PageDown');
+        break;
+      case 'PageUp':
+        // TN5250 Roll Down — previous page of a subfile/list
+        e.preventDefault();
+        onKeyPress?.('PageUp');
+        break;
       case 'Tab':
         e.preventDefault();
         navigateToNextField();

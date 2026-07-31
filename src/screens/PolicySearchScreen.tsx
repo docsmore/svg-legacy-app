@@ -10,12 +10,20 @@ interface PolicySearchScreenProps {
   onSelectPolicy?: (policyNumber: string) => void;
 }
 
+// Classic subfile paging: fixed 10 result rows per screen (rows 10-19 on a 24x80 terminal)
+const PAGE_SIZE = 10;
+
 const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Policy[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [message, setMessage] = useState<string>('');
+  const [page, setPage] = useState<number>(0);
+
+  const totalPages = Math.max(1, Math.ceil(searchResults.length / PAGE_SIZE));
+  const pagedResults = searchResults.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const hasMore = page < totalPages - 1;
 
   const handleKeyPress = (key: string) => {
     if (key === 'Enter') {
@@ -38,6 +46,22 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
     } else if (key === 'F7') {
       // Create a new policy
       router.push('/policy-create');
+    } else if (key === 'PageDown') {
+      // Roll Up — next page
+      if (hasMore) {
+        setPage(page + 1);
+        setMessage('');
+      } else {
+        setMessage('Bottom reached');
+      }
+    } else if (key === 'PageUp') {
+      // Roll Down — previous page
+      if (page > 0) {
+        setPage(page - 1);
+        setMessage('');
+      } else {
+        setMessage('Already at top');
+      }
     }
   };
 
@@ -75,6 +99,7 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
       setMessage(`Found ${results.length} policies`);
       setSelectedIndex(-1);
     }
+    setPage(0);
   };
 
   const clearSearch = () => {
@@ -82,6 +107,7 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
     setSearchResults([]);
     setSelectedIndex(-1);
     setMessage('');
+    setPage(0);
   };
 
   const selectPolicy = (policyNumber: string) => {
@@ -100,54 +126,56 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
     { key: 'Enter', description: 'Search/Select', action: () => {} }
   ];
 
-  // Calculate the row for selection input (after results, with some spacing)
-  const selectionInputRow = Math.max(12, 10 + searchResults.length + 1);
+  // Fixed layout: results occupy rows 10-19, selection input on row 21, footer on row 22
+  const selectionInputRow = 21;
 
-  // Dynamically generate search result fields
-  const resultFields = searchResults.flatMap((policy, index) => {
+  // Dynamically generate search result fields (current page only; numbering is global
+  // across pages so a typed selection always refers to the full result set)
+  const resultFields = pagedResults.flatMap((policy, index) => {
     const rowIndex = 10 + index;
+    const globalIndex = page * PAGE_SIZE + index;
     return [
-      { 
-        row: rowIndex, 
-        col: 2, 
-        length: 2, 
-        value: (index + 1).toString() + '.', 
-        isHighlighted: selectedIndex === index 
+      {
+        row: rowIndex,
+        col: 2,
+        length: 2,
+        value: (globalIndex + 1).toString() + '.',
+        isHighlighted: selectedIndex === globalIndex
       },
-      { 
-        row: rowIndex, 
-        col: 5, 
-        length: 10, 
-        value: policy.policyNumber, 
-        isHighlighted: selectedIndex === index 
+      {
+        row: rowIndex,
+        col: 5,
+        length: 10,
+        value: policy.policyNumber,
+        isHighlighted: selectedIndex === globalIndex
       },
-      { 
-        row: rowIndex, 
-        col: 16, 
-        length: 20, 
-        value: `${policy.policyHolder.firstName} ${policy.policyHolder.lastName}`, 
-        isHighlighted: selectedIndex === index 
+      {
+        row: rowIndex,
+        col: 16,
+        length: 20,
+        value: `${policy.policyHolder.firstName} ${policy.policyHolder.lastName}`,
+        isHighlighted: selectedIndex === globalIndex
       },
-      { 
-        row: rowIndex, 
-        col: 37, 
-        length: 10, 
-        value: policy.productType, 
-        isHighlighted: selectedIndex === index 
+      {
+        row: rowIndex,
+        col: 37,
+        length: 10,
+        value: policy.productType,
+        isHighlighted: selectedIndex === globalIndex
       },
-      { 
-        row: rowIndex, 
-        col: 48, 
-        length: 10, 
-        value: policy.status, 
-        isHighlighted: selectedIndex === index 
+      {
+        row: rowIndex,
+        col: 48,
+        length: 10,
+        value: policy.status,
+        isHighlighted: selectedIndex === globalIndex
       },
-      { 
-        row: rowIndex, 
-        col: 59, 
-        length: 10, 
-        value: `$${policy.premium.toFixed(2)}`, 
-        isHighlighted: selectedIndex === index 
+      {
+        row: rowIndex,
+        col: 59,
+        length: 10,
+        value: `$${policy.premium.toFixed(2)}`,
+        isHighlighted: selectedIndex === globalIndex
       }
     ];
   });
@@ -184,20 +212,33 @@ const PolicySearchScreen: React.FC<PolicySearchScreenProps> = ({ onSelectPolicy 
       
       // Results will be dynamically added here
       ...resultFields,
-      
-      // Selection input (dynamically positioned below results)
+
+      // Selection input (fixed position below the 10 result rows)
       { row: selectionInputRow, col: 2, length: 30, value: 'Type number to select:' },
-      { 
-        row: selectionInputRow, 
-        col: 25, 
-        length: 2, 
-        value: selectedIndex >= 0 ? (selectedIndex + 1).toString() : '', 
-        isEditable: true, 
-        fieldName: 'selectedIndex' 
+      {
+        row: selectionInputRow,
+        col: 25,
+        length: 2,
+        value: selectedIndex >= 0 ? (selectedIndex + 1).toString() : '',
+        isEditable: true,
+        fieldName: 'selectedIndex'
       },
-      
-      // Footer (dynamically positioned below selection input)
-      { row: selectionInputRow + 2, col: 0, length: 80, value: 'F1=Help  F3=Exit  F5=Refresh  F7=New Policy  Enter=Search/Select', isHighlighted: true }
+
+      // Subfile paging indicator (More.../Bottom), classic AS400 bottom-right marker
+      ...(searchResults.length > 0
+        ? [{
+            row: selectionInputRow,
+            col: 66,
+            length: 12,
+            value: hasMore
+              ? `More... (${page + 1}/${totalPages})`
+              : `Bottom (${page + 1}/${totalPages})`,
+            isHighlighted: true
+          }]
+        : []),
+
+      // Footer
+      { row: selectionInputRow + 2, col: 0, length: 80, value: 'F1=Help F3=Exit F5=Refresh F7=New Policy PgUp/PgDn=Roll Enter=Search/Select', isHighlighted: true }
     ],
     functionKeys
   };
