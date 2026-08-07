@@ -461,6 +461,49 @@ const mockPolicies: Policy[] = [
       }
     ],
     notes: 'SURRENDERED: Full surrender processed 2025-02-28. Confirmation #CONF002002. Net payout $67,032.00 disbursed via WIRE. Reason: Replacing with different policy.'
+  },
+  // LIFE policy for the Beneficiary Change Request demo: spouse's last
+  // name changed to "Doe" after marriage (still shows "Smith" here until
+  // a DeskGene-driven Beneficiary Maintenance update is applied), matching
+  // the scenario prefilled in svg-pas-simulation's
+  // beneficiary-change-request-form.html.
+  {
+    policyNumber: 'POL020003',
+    status: PolicyStatus.ACTIVE,
+    effectiveDate: '2023-02-01',
+    expirationDate: '2053-02-01',
+    premium: 250.00,
+    productType: ProductType.LIFE,
+    isPaidPlan: true,
+    policyHolder: {
+      id: 'PH022',
+      firstName: 'John',
+      lastName: 'Doe',
+      dateOfBirth: '1975-05-15',
+      ssn: '123-45-6789',
+      email: 'john.doe@example.com',
+      phone: '(555) 123-4567',
+      address: {
+        street1: '123 Main St',
+        city: 'Anytown',
+        state: 'CA',
+        zipCode: '90210'
+      }
+    },
+    beneficiaries: [
+      {
+        id: 'BEN023',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        dateOfBirth: '1987-06-22',
+        relationship: 'Spouse',
+        percentage: 100,
+        ssn: '987-65-4321',
+        email: 'jane.smith@example.com',
+        phone: '(555) 234-5678'
+      }
+    ],
+    notes: 'BENEFICIARY UPDATE PENDING: Spouse legal name change from Smith to Doe following marriage. Update via F7 Beneficiary Maintenance.'
   }
 ];
 
