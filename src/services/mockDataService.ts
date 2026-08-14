@@ -11,7 +11,10 @@ import {
   SurrenderRequest,
   SurrenderType,
   SurrenderRequestStatus,
-  PaymentMethod
+  PaymentMethod,
+  Agent,
+  AgentStatus,
+  AgentSyncStatus
 } from '@/types';
 
 // Helper function to calculate days until expiration
@@ -1218,4 +1221,249 @@ export const isPolicyEligibleForSurrender = (policyNumber: string): { eligible: 
   }
   
   return { eligible: true };
+};
+
+// ============================================================================
+// AGENT MASTER FILE (AGTMST) — shares a common cast of demo personas with
+// svg-pas-simulation (producer records) and svg-lifepro-simulation (SVGLife
+// agent hierarchy) so the same named agents appear consistently across all
+// three simulated systems during a connected demo.
+// ============================================================================
+
+const mockAgents: Agent[] = [
+  {
+    agentId: 'A0000001',
+    firstName: 'Robert',
+    lastName: 'Caldwell',
+    ssn: '111-22-0001',
+    email: 'r.caldwell@heritagepreneed.com',
+    phone: '(217) 555-0102',
+    licenseNumber: 'IL-9910442',
+    licenseState: 'IL',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Marketing Organization (IMO)',
+    appointmentDate: '2012-01-15',
+    commissionPercent: 60,
+    svgLifeAgentId: 'AGT-10001',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000021',
+    firstName: 'Marcus',
+    lastName: 'Bell',
+    ssn: '111-22-0021',
+    email: 'marcus.bell@heritagepreneed.com',
+    phone: '(312) 555-0148',
+    licenseNumber: 'IL-8845120',
+    licenseState: 'IL',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Regional Director',
+    uplineAgentId: 'A0000001',
+    appointmentDate: '2018-03-12',
+    commissionPercent: 50,
+    svgLifeAgentId: 'AGT-10021',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000201',
+    firstName: 'Linda',
+    lastName: 'Perry',
+    ssn: '111-22-0201',
+    email: 'linda.perry@pas.com',
+    phone: '(310) 555-0190',
+    licenseNumber: 'CA-4402187',
+    licenseState: 'CA',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Regional Director',
+    uplineAgentId: 'A0000001',
+    appointmentDate: '2015-09-01',
+    commissionPercent: 50,
+    pasAgentCode: 'PAS-LOGIN (linda.perry@pas.com)',
+    svgLifeAgentId: 'AGT-10201',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000210',
+    firstName: 'Robert',
+    lastName: 'Harris',
+    ssn: '111-22-0210',
+    email: 'r.harris@harrisins.com',
+    phone: '704-555-0101',
+    licenseNumber: 'NC-5581023',
+    licenseState: 'NC',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Funeral Director',
+    uplineAgentId: 'A0000201',
+    appointmentDate: '2017-04-10',
+    commissionPercent: 40,
+    pasAgentCode: 'AGT-0042',
+    svgLifeAgentId: 'AGT-10210',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000211',
+    firstName: 'Sandra',
+    lastName: 'Weaver',
+    ssn: '111-22-0211',
+    email: 's.weaver@weaverassoc.com',
+    phone: '919-555-0202',
+    licenseNumber: 'NC-5581099',
+    licenseState: 'NC',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Funeral Director',
+    uplineAgentId: 'A0000201',
+    appointmentDate: '2016-08-22',
+    commissionPercent: 40,
+    pasAgentCode: 'AGT-0071',
+    svgLifeAgentId: 'AGT-10211',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000212',
+    firstName: 'Thomas',
+    lastName: 'Grant',
+    ssn: '111-22-0212',
+    email: 't.grant@grantfs.com',
+    phone: '919-555-0303',
+    licenseNumber: 'NC-5581144',
+    licenseState: 'NC',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Preneed Counselor',
+    uplineAgentId: 'A0000211',
+    appointmentDate: '2020-02-17',
+    commissionPercent: 35,
+    pasAgentCode: 'AGT-0055',
+    svgLifeAgentId: 'AGT-10212',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000213',
+    firstName: 'Robert',
+    lastName: 'Martinez',
+    ssn: '111-22-0213',
+    email: 'r.martinez@heritagepreneed.com',
+    phone: '(814) 555-0147',
+    licenseNumber: 'IL-6612390',
+    licenseState: 'IL',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Preneed Counselor',
+    uplineAgentId: 'A0000001',
+    appointmentDate: '2021-11-03',
+    commissionPercent: 35,
+    pasAgentCode: 'AGT-101',
+    svgLifeAgentId: 'AGT-10213',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000214',
+    firstName: 'Jennifer',
+    lastName: 'Walsh',
+    ssn: '111-22-0214',
+    email: 'j.walsh@heritagepreneed.com',
+    phone: '(814) 555-0158',
+    licenseNumber: 'TX-6612441',
+    licenseState: 'TX',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Preneed Counselor',
+    uplineAgentId: 'A0000021',
+    appointmentDate: '2022-01-19',
+    commissionPercent: 35,
+    pasAgentCode: 'AGT-102',
+    svgLifeAgentId: 'AGT-10214',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000215',
+    firstName: 'Marcus',
+    lastName: 'Johnson',
+    ssn: '111-22-0215',
+    email: 'm.johnson@heritagepreneed.com',
+    phone: '(814) 555-0169',
+    licenseNumber: 'GA-6612502',
+    licenseState: 'GA',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Preneed Counselor',
+    uplineAgentId: 'A0000021',
+    appointmentDate: '2022-06-08',
+    commissionPercent: 35,
+    pasAgentCode: 'AGT-105',
+    svgLifeAgentId: 'AGT-10215',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000216',
+    firstName: 'Lisa',
+    lastName: 'Anderson',
+    ssn: '111-22-0216',
+    email: 'l.anderson@magnoliagardens.com',
+    phone: '(814) 555-0181',
+    licenseNumber: 'GA-6612557',
+    licenseState: 'GA',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Funeral Director',
+    uplineAgentId: 'A0000201',
+    appointmentDate: '2018-10-14',
+    commissionPercent: 40,
+    pasAgentCode: 'AGT-108',
+    svgLifeAgentId: 'AGT-10216',
+    syncStatus: AgentSyncStatus.SYNCED
+  },
+  {
+    agentId: 'A0000217',
+    firstName: 'Thomas',
+    lastName: 'Wright',
+    ssn: '111-22-0217',
+    email: 't.wright@evergreenmemorial.com',
+    phone: '(814) 555-0192',
+    licenseNumber: 'IL-6612618',
+    licenseState: 'IL',
+    status: AgentStatus.ACTIVE,
+    hierarchyLevel: 'Preneed Counselor',
+    uplineAgentId: 'A0000001',
+    appointmentDate: '2023-03-27',
+    commissionPercent: 35,
+    pasAgentCode: 'AGT-112',
+    svgLifeAgentId: 'AGT-10217',
+    syncStatus: AgentSyncStatus.SYNCED
+  }
+];
+
+export const getAgents = (): Agent[] => {
+  return mockAgents;
+};
+
+export const getAgentById = (agentId: string): Agent | undefined => {
+  return mockAgents.find(agent => agent.agentId === agentId);
+};
+
+export const searchAgents = (searchTerm: string): Agent[] => {
+  const term = searchTerm.toLowerCase();
+  return mockAgents.filter(agent =>
+    agent.agentId.toLowerCase().includes(term) ||
+    agent.firstName.toLowerCase().includes(term) ||
+    agent.lastName.toLowerCase().includes(term) ||
+    `${agent.firstName} ${agent.lastName}`.toLowerCase().includes(term) ||
+    agent.hierarchyLevel.toLowerCase().includes(term) ||
+    (agent.pasAgentCode || '').toLowerCase().includes(term) ||
+    (agent.svgLifeAgentId || '').toLowerCase().includes(term)
+  );
+};
+
+// Create a new agent record (Agent Onboarding). New appointments start out
+// PENDING_BATCH — on the real AS/400 this would be picked up by the nightly
+// batch job that replicates producer records to SVGLife and the PAS
+// producer file; here it just models that lag for the demo narrative.
+export const createAgent = (newAgent: Omit<Agent, 'agentId' | 'status' | 'syncStatus'>): Agent => {
+  const agentId = `A${Math.floor(Math.random() * 900000 + 100000).toString().padStart(7, '0')}`;
+
+  const agent: Agent = {
+    ...newAgent,
+    agentId,
+    status: AgentStatus.PENDING,
+    syncStatus: AgentSyncStatus.PENDING_BATCH
+  };
+
+  mockAgents.push(agent);
+
+  return agent;
 };

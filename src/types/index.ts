@@ -159,3 +159,42 @@ export enum PaymentMethod {
   ACH = 'ACH',
   WIRE = 'WIRE'
 }
+
+// Agent Master File — agent/producer records maintained on the AS/400.
+// Shares a common cast of demo personas with the other Solvrays demo
+// environments (svg-pas-simulation and svg-lifepro-simulation), linked via
+// pasAgentCode / svgLifeAgentId cross-reference fields.
+export interface Agent {
+  agentId: string;
+  firstName: string;
+  lastName: string;
+  ssn: string;
+  email: string;
+  phone: string;
+  licenseNumber: string;
+  licenseState: string;
+  status: AgentStatus;
+  hierarchyLevel: string;
+  uplineAgentId?: string;
+  appointmentDate: string;
+  commissionPercent: number;
+  /** Cross-reference to the matching producer record in svg-pas-simulation, if any. */
+  pasAgentCode?: string;
+  /** Cross-reference to the matching agent record in svg-lifepro-simulation (SVGLife), if any. */
+  svgLifeAgentId?: string;
+  /** Batch sync status to downstream systems (SVGLife / PAS producer file). */
+  syncStatus?: AgentSyncStatus;
+}
+
+export enum AgentStatus {
+  ACTIVE = 'ACTIVE',
+  PENDING = 'PENDING',
+  SUSPENDED = 'SUSPENDED',
+  TERMINATED = 'TERMINATED'
+}
+
+export enum AgentSyncStatus {
+  SYNCED = 'SYNCED',
+  PENDING_BATCH = 'PENDING_BATCH',
+  NOT_APPLICABLE = 'N/A'
+}

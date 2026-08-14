@@ -42,6 +42,12 @@ const MainMenuScreen: React.FC = () => {
       case '4':
         router.push('/product-management');
         break;
+      case '5':
+        router.push('/agent-search');
+        break;
+      case '6':
+        router.push('/agent-onboard');
+        break;
       case '90':
         alert('Signing off...');
         break;
@@ -71,12 +77,14 @@ const MainMenuScreen: React.FC = () => {
       { row: 7, col: 5, length: 40, value: '2. Policy Details' },
       { row: 8, col: 5, length: 40, value: '3. Policyholder Management' },
       { row: 9, col: 5, length: 40, value: '4. Product Management' },
-      { row: 11, col: 5, length: 40, value: '90. Sign Off' },
+      { row: 10, col: 5, length: 40, value: '5. Agent Master File Inquiry' },
+      { row: 11, col: 5, length: 40, value: '6. Agent Onboarding (New Appointment)' },
+      { row: 13, col: 5, length: 40, value: '90. Sign Off' },
       
       // Input field
-      { row: 13, col: 2, length: 20, value: 'Option ===> ' },
+      { row: 15, col: 2, length: 20, value: 'Option ===> ' },
       { 
-        row: 13, 
+        row: 15, 
         col: 13, 
         length: 2, 
         value: selectedOption, 
