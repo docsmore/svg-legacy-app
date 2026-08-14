@@ -26,9 +26,11 @@ const AgentSearchScreen: React.FC = () => {
       if (searchTerm && searchTerm.trim().length > 0) {
         performSearch();
       } else if (selectedIndex >= 0 && selectedIndex < searchResults.length) {
+        const agent = searchResults[selectedIndex];
         setMessage(
-          `${searchResults[selectedIndex].firstName} ${searchResults[selectedIndex].lastName} — ` +
-          `${searchResults[selectedIndex].hierarchyLevel} — Status: ${searchResults[selectedIndex].status}`
+          `${agent.firstName} ${agent.lastName} — ${agent.hierarchyLevel}` +
+          (agent.assignedLocation ? ` — ${agent.assignedLocation}` : '') +
+          ` — Status: ${agent.status}`
         );
       } else if (searchResults.length > 0) {
         setMessage('Please select an agent by typing a number');

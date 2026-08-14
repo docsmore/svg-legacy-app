@@ -176,6 +176,8 @@ export interface Agent {
   status: AgentStatus;
   hierarchyLevel: string;
   uplineAgentId?: string;
+  /** Affiliated funeral home / branch location name, if the agent is assigned to one. */
+  assignedLocation?: string;
   appointmentDate: string;
   commissionPercent: number;
   /** Cross-reference to the matching producer record in svg-pas-simulation, if any. */

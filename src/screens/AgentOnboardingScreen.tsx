@@ -37,6 +37,7 @@ const AgentOnboardingScreen: React.FC = () => {
   const [hierarchyData, setHierarchyData] = useState({
     hierarchyLevel: 'Preneed Counselor',
     uplineAgentId: '',
+    assignedLocation: '',
     commissionPercent: '35'
   });
 
@@ -77,6 +78,7 @@ const AgentOnboardingScreen: React.FC = () => {
           licenseState: licenseData.licenseState,
           hierarchyLevel: hierarchyData.hierarchyLevel,
           uplineAgentId: hierarchyData.uplineAgentId || undefined,
+          assignedLocation: hierarchyData.assignedLocation || undefined,
           appointmentDate: new Date().toISOString().split('T')[0],
           commissionPercent: parseFloat(hierarchyData.commissionPercent) || 0
         });
@@ -186,8 +188,11 @@ const AgentOnboardingScreen: React.FC = () => {
       { row: 11, col: 2, length: 20, value: 'Upline Agent #:' },
       { row: 11, col: 25, length: 9, value: hierarchyData.uplineAgentId, isEditable: true, fieldName: 'uplineAgentId' } as ScreenField,
       { row: 12, col: 2, length: 60, value: '  (blank = none; F5 on Agent Search to look up agent #s)' },
-      { row: 14, col: 2, length: 20, value: 'Commission %:' },
-      { row: 14, col: 25, length: 6, value: hierarchyData.commissionPercent, isEditable: true, fieldName: 'commissionPercent' } as ScreenField,
+      { row: 14, col: 2, length: 20, value: 'Assigned Location:' },
+      { row: 14, col: 25, length: 45, value: hierarchyData.assignedLocation, isEditable: true, fieldName: 'assignedLocation' } as ScreenField,
+      { row: 15, col: 2, length: 60, value: '  (e.g. funeral home / branch name — City, ST; optional)' },
+      { row: 17, col: 2, length: 20, value: 'Commission %:' },
+      { row: 17, col: 25, length: 6, value: hierarchyData.commissionPercent, isEditable: true, fieldName: 'commissionPercent' } as ScreenField,
       { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Back  F4=Save & Continue', isHighlighted: true }
     ];
   } else if (step === OnboardingStep.REVIEW) {
@@ -208,8 +213,10 @@ const AgentOnboardingScreen: React.FC = () => {
       { row: 13, col: 25, length: 30, value: hierarchyData.hierarchyLevel },
       { row: 14, col: 2, length: 20, value: 'Upline Agent #:' },
       { row: 14, col: 25, length: 20, value: hierarchyData.uplineAgentId.toUpperCase() || 'NONE' },
-      { row: 15, col: 2, length: 20, value: 'Commission %:' },
-      { row: 15, col: 25, length: 10, value: `${hierarchyData.commissionPercent}%` },
+      { row: 15, col: 2, length: 20, value: 'Assigned Location:' },
+      { row: 15, col: 25, length: 45, value: hierarchyData.assignedLocation || 'NONE' },
+      { row: 16, col: 2, length: 20, value: 'Commission %:' },
+      { row: 16, col: 25, length: 10, value: `${hierarchyData.commissionPercent}%` },
       { row: 22, col: 0, length: 80, value: 'F1=Help  F3=Back  F4=Save & Create Agent', isHighlighted: true }
     ];
   } else if (step === OnboardingStep.COMPLETE) {
